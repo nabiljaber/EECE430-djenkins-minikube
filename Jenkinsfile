@@ -3,7 +3,15 @@ pipeline {
   triggers { pollSCM('H/2 * * * *') }
 
   stages {
-    // Remove Checkout stage when job is "Pipeline script from SCM"
+    stage('Checkout + Clean') {
+      steps {
+        deleteDir() // clean workspace
+        git branch: 'main', url: 'https://github.com/<your-username>/EECE430-djenkins-minikube.git'
+        bat 'git fetch --all'
+        bat 'git reset --hard origin/main'
+      }
+    }
+
     stage('Build Image in Minikube') {
       steps {
         bat '''
