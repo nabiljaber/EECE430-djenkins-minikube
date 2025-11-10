@@ -6,7 +6,7 @@ pipeline {
     stage('Checkout + Clean') {
       steps {
         deleteDir() // clean workspace
-        git branch: 'main', url: 'https://github.com/<your-username>/EECE430-djenkins-minikube.git'
+        git branch: 'main', url: 'https://github.com/nabiljaber/EECE430-djenkins-minikube.git'
         bat 'git fetch --all'
         bat 'git reset --hard origin/main'
       }
