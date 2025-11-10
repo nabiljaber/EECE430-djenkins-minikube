@@ -7,6 +7,7 @@ pipeline {
       steps {
         deleteDir()
         git branch: 'main', url: 'https://github.com/nabiljaber/EECE430-djenkins-minikube.git'
+        bat 'del /f /q "%WORKSPACE%\\minikube" 2>nul'
       }
     }
 
