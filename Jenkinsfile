@@ -5,10 +5,20 @@ pipeline {
   stages {
     stage('Checkout + Clean') {
       steps {
-        deleteDir() // clean workspace
+        deleteDir()
         git branch: 'main', url: 'https://github.com/nabiljaber/EECE430-djenkins-minikube.git'
-        bat 'git fetch --all'
-        bat 'git reset --hard origin/main'
+      }
+    }
+
+    stage('Verify Tooling') {
+      steps {
+        bat '''
+        where minikube
+        minikube version
+        where docker
+        docker version
+        minikube status
+        '''
       }
     }
 
@@ -27,6 +37,7 @@ pipeline {
         bat '''
         minikube kubectl -- apply -f deployment.yaml
         minikube kubectl -- apply -f service.yaml
+        minikube kubectl -- rollout restart deployment/django-deployment
         minikube kubectl -- rollout status deployment/django-deployment
         minikube kubectl -- exec deploy/django-deployment -- python manage.py migrate --noinput
         '''
