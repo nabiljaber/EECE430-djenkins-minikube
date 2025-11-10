@@ -3,36 +3,36 @@ pipeline {
   triggers { pollSCM('H/2 * * * *') }
 
   stages {
-    stage('Checkout + Clean') {
+    stage('Checkout (fresh)') {
       steps {
         deleteDir()
         git branch: 'main', url: 'https://github.com/nabiljaber/EECE430-djenkins-minikube.git'
       }
     }
 
-    stage('Verify Tooling') {
+    stage('Ensure Minikube up') {
       steps {
         bat '''
         where minikube
-        minikube version
         where docker
-        docker version
+        minikube status || minikube start --driver=docker --kubernetes-version=v1.34.0 --memory=6000 --cpus=2 --disk-size=20g
         minikube status
         '''
       }
     }
 
-    stage('Build Image in Minikube') {
+    stage('Build image in Minikube') {
       steps {
         bat '''
         call minikube docker-env --shell=cmd > mk_env.bat
         call mk_env.bat
+        docker version
         docker build -t mydjangoapp:latest .
         '''
       }
     }
 
-    stage('Deploy & Migrate') {
+    stage('Deploy & migrate') {
       steps {
         bat '''
         minikube kubectl -- apply -f deployment.yaml
